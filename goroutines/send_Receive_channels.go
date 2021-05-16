@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 )
 
 func main() {
@@ -13,19 +12,16 @@ func main() {
 
 	wg.Add(2)
 
-	go func(ch chan int, wg *sync.WaitGroup) {
+	//receive only channel
+	go func(ch <-chan int, wg *sync.WaitGroup) {
 		fmt.Println("received", <-ch)
-		fmt.Println("sending 24")
-		ch <- 24
 		wg.Done()
 	}(ch, wg)
 
-	go func(ch chan int, wg *sync.WaitGroup) {
+	//send onyl channel
+	go func(ch chan<- int, wg *sync.WaitGroup) {
 		fmt.Println("Sending 42")
 		ch <- 42 //writting to the channel
-		//sleep here for some time otherwise there will deadlock as we are doing sending and receiving in the same routine
-		time.Sleep(5 * time.Millisecond)
-		fmt.Println("received ", <-ch)
 		wg.Done()
 	}(ch, wg)
 
